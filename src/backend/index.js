@@ -8,6 +8,7 @@ const passportHTTPBearer = require('passport-http-bearer').Strategy;
 const mongo = require('./database.js');
 const path = require('path');
 
+const { off } = require('process');
 
 const PORT = process.env.PORT || 8080;
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';
@@ -45,6 +46,7 @@ const start = async() => {
     }));
 
     app.use(cors())
+
 
     app.use(passport.initialize());
 
