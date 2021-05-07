@@ -1,15 +1,14 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const cors = require('cors')
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const passportLocal = require('passport-local').Strategy;
 const passportHTTPBearer = require('passport-http-bearer').Strategy;
 const mongo = require('./database.js');
-const agenda = require('./agenda.js');
-const marvel = require('./marvel.js');
 const path = require('path');
+
 const { off } = require('process');
-const cors = require('cors');
 
 const PORT = process.env.PORT || 8080;
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';
@@ -21,8 +20,6 @@ const start = async() => {
     const app = express();
     console.log("MongoDB setup")
     const db = await mongo.connect();
-    console.log("Agenda setup")
-    agenda.start(db);
 
     passport.use(new passportLocal((username, password, done) => {
         const users = db.db.collection('users');
@@ -48,7 +45,8 @@ const start = async() => {
         });
     }));
 
-    app.use(cors());
+    app.use(cors())
+
 
     app.use(passport.initialize());
 
@@ -64,15 +62,6 @@ const start = async() => {
             if (err) return response.send({ error: 'db error' });
             return response.send({ token: user.token });
         });
-    });
-
-    app.post('/api/search', async(request, response) => {
-        let search = request.body.search;
-        console.log(`[Search] ${search}`);
-        let limit = request.body.limit || 10;
-        let offset = request.body.offset || 1;
-        let data = await marvel.searchComics(search, limit, offset);
-        return response.send(data);
     });
 
     app.post('/api/local', passport.authenticate('bearer', { session: false }), async(request, response) => {
@@ -105,17 +94,6 @@ const start = async() => {
         let comicsDocuments = await mongo.getComicsForSeries(db.db, request.params.seriesID);
         console.log("[Tracking] GET")
         return response.send(comicsDocuments);
-    });
-
-
-    app.get('/api/statistics', async(request, response) => {
-        console.log("[Statistics] GET")
-        return response.send(await mongo.getStatistics(db.db));
-    });
-
-    app.get('/api/statistics/latest', async(request, response) => {
-        console.log("[Statistics] GET Latest")
-        return response.send(await mongo.getStatisticsLatest(db.db));
     });
 
     app.listen(PORT, () => console.log(`Marvel Hero Manager API listening on port ${PORT}`));

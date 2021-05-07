@@ -8,4 +8,4 @@ COPY ./package.json /app/
 
 RUN npm install
 
-ENTRYPOINT npm run nodemon-legacy
+ENTRYPOINT npm run nodemon 
