@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: hero-manager-marvel
+  labels:
+    name: hero-manager-marvel
+spec:
+  selector:
+    matchLabels:
+      name: hero-manager-marvel
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: hero-manager-marvel
+    spec:
+      containers:
+      - name: <<CONTAINER_NAME>>
+        image: <<IMAGE_NAME IF LOCAL || IMAGE FULL NAME IF IN REGISTRY>>
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: <<CONTAINER PORT>>
+        resources:
+        env:
+            - name: <<ENV_NAME>>
+              value: <<ENV_VALUE>>
+        
